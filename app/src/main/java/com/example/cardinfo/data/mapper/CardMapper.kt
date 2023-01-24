@@ -1,0 +1,21 @@
+package com.example.cardinfo.data.mapper
+
+import com.example.cardinfo.data.model.CardResponse
+import com.example.cardinfo.data.model.map
+import com.example.cardinfo.model.room.entities.Card
+
+class CardMapper : (CardResponse) -> Card {
+    override fun invoke(cardResponse: CardResponse): Card {
+        return with(cardResponse) {
+            Card(
+                number = number?.map(),
+                bank = bank?.map(),
+                country = country?.map(),
+                brand = brand,
+                prepaid = prepaid,
+                scheme = scheme,
+                type = type
+            )
+        }
+    }
+}

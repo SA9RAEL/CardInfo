@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">CardInfo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_card_info">Search Card Info</string>
+    <string name="enter_your_bin_here">Enter your BIN here</string>
+    <string name="scheme_network">SCHEME / NETWORK</string>
+    <string name="type">TYPE</string>
+    <string name="card_information_for_you">Card Information For You</string>
+    <string name="brand">BRAND</string>
+    <string name="prepaid">PREPAID</string>
+    <string name="card_number">CARD NUMBER</string>
+    <string name="length">LENGTH</string>
+    <string name="luhn">LUHN</string>
+    <string name="latitude">latitude:</string>
+    <string name="longitude">longitude:</string>
+    <string name="history">History</string>
+    <string name="bank">BANK</string>
+    <string name="country">COUNTRY</string>
+    <string name="history_fragment_title">History</string>
+    <string name="search_fragment_title">Card Information</string>
+
+</resources>
