@@ -13,6 +13,6 @@ class Country(
     val countryName: String?,
     val emoji: String?,
     val currency: String?,
-    val latitude: Double?,
-    val longitude: Double?
+    val latitude: Float?,
+    val longitude: Float?
 )

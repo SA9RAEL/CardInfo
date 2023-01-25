@@ -29,7 +29,6 @@
         android:hint="@string/enter_your_bin_here"
         android:inputType="number"
         android:maxLength="8"
-        android:text="45717360"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/search_button"
         app:layout_constraintEnd_toEndOf="parent"

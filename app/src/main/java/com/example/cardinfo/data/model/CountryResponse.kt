@@ -2,7 +2,6 @@ package com.example.cardinfo.data.model
 
 import com.example.cardinfo.model.room.entities.Country
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.Serializable
 
 data class CountryResponse(
     @SerializedName("numeric")
@@ -16,9 +15,9 @@ data class CountryResponse(
     @SerializedName("currency")
     val currency: String,
     @SerializedName("latitude")
-    val latitude: Double,
+    val latitude: Float,
     @SerializedName("longitude")
-    val longitude: Double
+    val longitude: Float
 )
 
 fun CountryResponse.map(): Country {
