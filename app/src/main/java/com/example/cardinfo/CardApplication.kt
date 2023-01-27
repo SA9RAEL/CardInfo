@@ -13,5 +13,4 @@ class CardApplication : Application() {
         DaggerAppComponent.builder().build()
     }
 
-
 }
