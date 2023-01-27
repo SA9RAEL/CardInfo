@@ -4,8 +4,9 @@ import androidx.lifecycle.*
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(private val repository: CardRepository) : ViewModel() {
+class SearchViewModel @Inject constructor (private val repository: CardRepository) : ViewModel() {
 
     private val _cardInfo = MutableLiveData<Card>()
     val cardInfo: LiveData<Card> = _cardInfo
