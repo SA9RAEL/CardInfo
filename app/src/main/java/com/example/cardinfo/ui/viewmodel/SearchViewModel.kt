@@ -1,12 +1,15 @@
 package com.example.cardinfo.ui.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SearchViewModel @Inject constructor (private val repository: CardRepository) : ViewModel() {
+class SearchViewModel @Inject constructor(private val repository: CardRepository) : ViewModel() {
 
     private val _cardInfo = MutableLiveData<Card>()
     val cardInfo: LiveData<Card> = _cardInfo
@@ -22,15 +25,5 @@ class SearchViewModel @Inject constructor (private val repository: CardRepositor
             )
         }
     }
-}
 
-class SearchViewModelFactory(private val repository: CardRepository) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-            @Suppress("UNCHECKED CAST")
-            return SearchViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

@@ -1,5 +1,6 @@
 package com.example.cardinfo.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,26 +12,36 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.cardinfo.R
-import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
-import com.example.cardinfo.ui.viewmodel.SearchViewModelFactory
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasAndroidInjector
+import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 private const val MAX_LENGTH = 8
 
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), HasAndroidInjector {
 
+    @Inject
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
 
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModelFactory(repository)
-    }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel by viewModels<SearchViewModel> { viewModelFactory }
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,7 +111,7 @@ class SearchFragment : Fragment() {
 
             searchButton.setOnClickListener {
                 val cardNumber = binding.editText.text.toString().toInt()
-                //  viewModel.getCardInfo(cardNumber)
+                viewModel.getCardInfo(cardNumber)
             }
 
             fab.setOnClickListener {
@@ -122,5 +133,7 @@ class SearchFragment : Fragment() {
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
         startActivity(mapIntent)
     }
+
+    override fun androidInjector(): AndroidInjector<Any> = androidInjector
 
 }

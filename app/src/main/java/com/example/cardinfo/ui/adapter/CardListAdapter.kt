@@ -51,11 +51,11 @@ class CardListAdapter : ListAdapter<Card, CardListAdapter.CardViewHolder>(CARDS_
     companion object {
         private val CARDS_COMPARATOR = object : DiffUtil.ItemCallback<Card>() {
             override fun areItemsTheSame(oldItem: Card, newItem: Card): Boolean {
-                return oldItem === newItem
+                return oldItem.number?.numberId === newItem.number?.numberId
             }
 
             override fun areContentsTheSame(oldItem: Card, newItem: Card): Boolean {
-                return oldItem.number == newItem.number
+                return oldItem == newItem
             }
         }
     }

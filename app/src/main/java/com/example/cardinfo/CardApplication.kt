@@ -1,20 +1,24 @@
 package com.example.cardinfo
 
 import android.app.Application
-import com.example.cardinfo.di.AppComponent
 import com.example.cardinfo.di.DaggerAppComponent
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasAndroidInjector
+import javax.inject.Inject
 
-class CardApplication : Application() {
-
-    // private val database by lazy { CardDatabase.getDatabase(this) }
-    private lateinit var appComponent: AppComponent
-
+class CardApplication : Application(), HasAndroidInjector {
 
     override fun onCreate() {
         super.onCreate()
-        appComponent = DaggerAppComponent.builder()
+        DaggerAppComponent.builder()
             .context(context = this)
             .build()
+            .inject(this@CardApplication)
     }
+
+    @Inject
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+    override fun androidInjector(): AndroidInjector<Any> = androidInjector
 
 }
