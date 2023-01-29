@@ -8,18 +8,26 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.cardinfo.R
+import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
+import com.example.cardinfo.ui.viewmodel.SearchViewModel
+import com.example.cardinfo.ui.viewmodel.SearchViewModelFactory
+import javax.inject.Inject
 
 private const val MAX_LENGTH = 8
 
 class SearchFragment : Fragment() {
-//    private val viewModel: SearchViewModel by viewModels {
-//
-//    }
+
+
+    private val viewModel: SearchViewModel by viewModels {
+        SearchViewModelFactory(repository)
+    }
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -60,13 +68,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-//        viewModel.cardInfo.observe(viewLifecycleOwner) { oneCardInfo ->
-//            bindInformation(oneCardInfo)
-//        }
-//
-//        viewModel.failure.observe(viewLifecycleOwner) { failure ->
-//            Toast.makeText(requireContext(), failure, Toast.LENGTH_SHORT).show()
-//        }
+        viewModel.cardInfo.observe(viewLifecycleOwner) { oneCardInfo ->
+            bindInformation(oneCardInfo)
+        }
+
+        viewModel.failure.observe(viewLifecycleOwner) { failure ->
+            Toast.makeText(requireContext(), failure, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun configureView() {
@@ -92,7 +100,7 @@ class SearchFragment : Fragment() {
 
             searchButton.setOnClickListener {
                 val cardNumber = binding.editText.text.toString().toInt()
-              //  viewModel.getCardInfo(cardNumber)
+                //  viewModel.getCardInfo(cardNumber)
             }
 
             fab.setOnClickListener {
