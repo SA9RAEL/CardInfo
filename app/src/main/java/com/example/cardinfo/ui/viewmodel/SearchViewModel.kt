@@ -4,8 +4,11 @@ import androidx.lifecycle.*
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(private val repository: CardRepository) : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val repository: CardRepository
+) : ViewModel() {
 
     private val _cardInfo = MutableLiveData<Card>()
     val cardInfo: LiveData<Card> = _cardInfo
@@ -20,16 +23,5 @@ class SearchViewModel(private val repository: CardRepository) : ViewModel() {
                 onFailure = { _failure.value = it.message }
             )
         }
-    }
-}
-
-class SearchViewModelFactory(private val repository: CardRepository) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-            @Suppress("UNCHECKED CAST")
-            return SearchViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

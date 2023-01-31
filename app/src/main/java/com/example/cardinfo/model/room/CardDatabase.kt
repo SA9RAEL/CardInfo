@@ -20,25 +20,9 @@ import com.example.cardinfo.model.room.entities.Number
 )
 abstract class CardDatabase : RoomDatabase() {
 
-    abstract fun cardDao(): CardDao
-
     companion object {
-        @Volatile
-        private var INSTANCE: CardDatabase? = null
-
-        fun getDatabase(
-            context: Context
-        ): CardDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    CardDatabase::class.java,
-                    "card_database"
-                )
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
+        const val DB_NAME = "card_database"
     }
+
+    abstract fun cardDao(): CardDao
 }

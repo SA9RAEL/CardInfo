@@ -1,20 +1,15 @@
 package com.example.cardinfo
 
 import android.app.Application
-import android.content.Context
-import com.example.cardinfo.data.mapper.CardMapper
-import com.example.cardinfo.data.repository.CardRepository
-import com.example.cardinfo.model.room.CardDatabase
+import com.example.cardinfo.di.AppComponent
+import com.example.cardinfo.di.DaggerAppComponent
 
 class CardApplication : Application() {
 
-    private val database by lazy { CardDatabase.getDatabase(this) }
-    val repository by lazy { CardRepository(database.cardDao(), CardMapper()) }
+    lateinit var appComponent: AppComponent
 
-    companion object {
-        fun getRepository(context: Context): CardRepository {
-            return (context.applicationContext as CardApplication).repository
-        }
+    override fun onCreate() {
+        super.onCreate()
+        appComponent = DaggerAppComponent.builder().withContext(this).build()
     }
-
 }
