@@ -12,34 +12,31 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.cardinfo.CardApplication
 import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
-import dagger.android.support.AndroidSupportInjection
+import com.example.cardinfo.ui.viewmodel.ViewModelFactory
 import javax.inject.Inject
 
 private const val MAX_LENGTH = 8
 
-class SearchFragment : Fragment(), HasAndroidInjector {
+class SearchFragment : Fragment() {
 
     @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+    lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel by viewModels<SearchViewModel> { viewModelFactory }
+    private val viewModel: SearchViewModel by viewModels {
+        viewModelFactory
+    }
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
+        (context.applicationContext as CardApplication).appComponent.inject(this)
         super.onAttach(context)
     }
 
@@ -133,7 +130,5 @@ class SearchFragment : Fragment(), HasAndroidInjector {
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
         startActivity(mapIntent)
     }
-
-    override fun androidInjector(): AndroidInjector<Any> = androidInjector
 
 }

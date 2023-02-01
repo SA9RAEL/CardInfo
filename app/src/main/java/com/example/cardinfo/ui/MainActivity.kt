@@ -6,26 +6,15 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.cardinfo.R
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
-import javax.inject.Inject
 
 /**
  * Activity for card information
  */
-class MainActivity : AppCompatActivity(R.layout.activity_main), HasAndroidInjector  {
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private lateinit var navController: NavController
 
-    @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
-
-    override fun androidInjector(): AndroidInjector<Any> = androidInjector
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
 
         // Retrieve NavController from the NavHostFragment
@@ -44,6 +33,5 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), HasAndroidInject
         return navController.navigateUp()
                 || super.onSupportNavigateUp()
     }
-
 
 }
