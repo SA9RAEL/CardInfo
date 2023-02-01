@@ -18,6 +18,10 @@ import com.example.cardinfo.model.room.entities.Number
 )
 abstract class CardDatabase : RoomDatabase() {
 
+    companion object {
+        const val DB_NAME = "card_database"
+    }
+
     abstract fun cardDao(): CardDao
 
 }
