@@ -38,12 +38,10 @@ abstract class AllModules {
     }
 
     @Binds
-    @IntoMap
-    @ViewModelKey(HistoryViewModel::class)
+    @[IntoMap ViewModelKey(HistoryViewModel::class)]
     abstract fun bindHistoryViewModel(viewModel: HistoryViewModel): ViewModel
 
     @Binds
-    @IntoMap
-    @ViewModelKey(SearchViewModel::class)
+    @[IntoMap ViewModelKey(SearchViewModel::class)]
     abstract fun bindSearchViewModel(viewModel: SearchViewModel): ViewModel
 }
