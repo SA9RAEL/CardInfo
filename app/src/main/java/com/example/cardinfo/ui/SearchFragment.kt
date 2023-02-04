@@ -6,47 +6,29 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.cardinfo.CardApplication
 import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
+import com.example.cardinfo.ui.viewmodel.DelegateFragment
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
-import com.example.cardinfo.ui.viewmodel.ViewModelFactory
-import javax.inject.Inject
 
 private const val MAX_LENGTH = 8
 
-class SearchFragment : Fragment() {
+class SearchFragment : DelegateFragment(R.layout.fragment_search) {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
-    private val viewModel: SearchViewModel by viewModels {
-        viewModelFactory
-    }
-
-    private var _binding: FragmentSearchBinding? = null
-    private val binding get() = _binding!!
+    private val binding by viewBinding(FragmentSearchBinding::bind)
 
     override fun onAttach(context: Context) {
         (context.applicationContext as CardApplication).appComponent.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,13 +47,12 @@ class SearchFragment : Fragment() {
             bankUrlTextView.text = card.bank?.url
             bankNumberTextView.text = card.bank?.phone
             brandResultTextView.text = card.brand
-            prepaidResultTextView.text = card.prepaid.toString()
-            cardNumberLengthResultTextView.text = card.number?.length.toString()
-            cardNumberLuhnResultTextView.text = card.number?.luhn.toString()
             countryNameTextView.text = card.country?.countryName
+            prepaidResultTextView.text = card.prepaid.toString()
+            cardNumberLuhnResultTextView.text = card.number?.luhn.toString()
+            cardNumberLengthResultTextView.text = card.number?.length.toString()
             countryLatitudeResultTextView.text = card.country?.latitude.toString()
             countryLongitudeResultTextView.text = card.country?.longitude.toString()
-
         }
     }
 

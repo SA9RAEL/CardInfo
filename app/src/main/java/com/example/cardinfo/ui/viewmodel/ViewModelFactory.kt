@@ -8,21 +8,11 @@ import javax.inject.Singleton
 
 @Singleton
 class ViewModelFactory @Inject
-constructor(private val viewModels: @JvmSuppressWildcards MutableMap<Class<out ViewModel>, Provider<ViewModel>>) :
+constructor(private val map: @JvmSuppressWildcards Map<Class<out ViewModel>, Provider<ViewModel>>) :
     ViewModelProvider.Factory {
-
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val creator: Provider<out ViewModel> = viewModels[modelClass]
-            ?: viewModels.asIterable().firstOrNull { modelClass.isAssignableFrom(it.key) }?.value
-            ?: throw IllegalArgumentException("Unknown model class: $modelClass")
-
-        return try {
-            @Suppress("UNCHECKED_CAST")
-            creator.get() as T
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-
+        return map.getValue(modelClass as Class<out ViewModel>).get() as T
     }
 
 }
