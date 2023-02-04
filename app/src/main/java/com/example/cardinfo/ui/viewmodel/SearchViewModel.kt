@@ -19,12 +19,17 @@ class SearchViewModel @Inject constructor(
     private val _failure = MutableLiveData<String>()
     val failure: LiveData<String> = _failure
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun getCardInfo(cardNumber: Int) {
         viewModelScope.launch {
+            _isLoading.value = true
             repository.getCardInfo(cardNumber).fold(
                 onSuccess = { _cardInfo.value = it },
                 onFailure = { _failure.value = it.message }
             )
+            _isLoading.value = false
         }
     }
 

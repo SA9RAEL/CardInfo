@@ -9,10 +9,9 @@ import com.example.cardinfo.CardApplication
 import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentHistoryBinding
 import com.example.cardinfo.ui.adapter.CardListAdapter
-import com.example.cardinfo.ui.viewmodel.DelegateFragment
 import com.example.cardinfo.ui.viewmodel.HistoryViewModel
 
-class HistoryFragment : DelegateFragment(R.layout.fragment_history) {
+class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private val viewModel: HistoryViewModel by viewModels { viewModelFactory }
 
