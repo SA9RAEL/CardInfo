@@ -65,24 +65,23 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
             when (response) {
                 is Resource.Error -> {
                     Log.d(TAG, "error")
-                    viewModel.failure.observe(viewLifecycleOwner) { failure ->
-                        Toast.makeText(requireContext(), failure, Toast.LENGTH_SHORT).show()
-                    }
-            }
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.INVISIBLE
+
+                }
                 is Resource.Loading -> {
                     Log.d(TAG, "load")
-                    viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-                        binding.progressBar.isVisible = isLoading
-                    }
+                    binding.progressBar.visibility = View.VISIBLE
+
                 }
 
 
                 is Resource.Success -> {
                     Log.d(TAG, "success")
-                    viewModel.cardInfo.observe(viewLifecycleOwner) { oneCardInfo ->
-                        binding.content.isVisible = true
-                        bindInformation(oneCardInfo)
-                    }
+                    response.data?.let { d -> bindInformation(d) }
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.content.visibility = View.VISIBLE
+
                 }
 
             }
