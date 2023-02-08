@@ -4,47 +4,40 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cardinfo.data.model.CardResponse
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import com.example.cardinfo.network.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Response
+import retrofit2.HttpException
 import javax.inject.Inject
+import javax.net.ssl.SSLHandshakeException
 
 class SearchViewModel @Inject constructor(
     private val repository: CardRepository,
 ) : ViewModel() {
 
-    private val _cardInfo = MutableLiveData<Card>()
-    val cardInfo: LiveData<Card> = _cardInfo
-
-    private val _failure = MutableLiveData<String>()
-    val failure: LiveData<String> = _failure
-
-    private val _state = MutableLiveData<Resource<CardResponse>>()
-    val state: LiveData<Resource<CardResponse>> = _state
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    private var response: Response<CardResponse>? = null
+    private val _state = MutableLiveData<Resource<Card>>()
+    val state: LiveData<Resource<Card>> = _state
 
     fun getCardInfo(cardNumber: Int) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.postValue(Resource.Loading())
-            if (response?.isSuccessful == true) {
-                response?.body()?.let {
-                    _state.postValue((Resource.Success(it)))
-                }
-                repository.getCardInfo(cardNumber).fold(
-                    onSuccess = { _cardInfo.value = it },
-                    onFailure = { _failure.value = it.message }
-                )
-            } else {
-                _state.postValue(response?.message()?.let { Resource.Error(it) })
-            }
+            repository.getCardInfo(cardNumber).fold(
+                onSuccess = { data -> _state.postValue((Resource.Success(data))) },
+                onFailure = { error ->
+                    when (error) {
+                        is SSLHandshakeException ->
+                            _state.postValue((Resource.Error("SSLHandshakeException")))
 
+                        is HttpException ->
+                            _state.postValue((Resource.Error("HttpException")))
+
+                        else ->
+                            _state.postValue((Resource.Error("Invalid card number")))
+                    }
+                }
+            )
         }
 
 }

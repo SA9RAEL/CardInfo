@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -21,7 +20,7 @@ import com.example.cardinfo.network.Resource
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
 
 private const val MAX_LENGTH = 8
-private const val TAG = "TAG"
+
 class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
     private val viewModel: SearchViewModel by viewModels { viewModelFactory }
@@ -61,28 +60,19 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
     private fun observeViewModel() {
 
         viewModel.state.observe(viewLifecycleOwner) { response ->
-            Log.d(TAG, "observe state")
             when (response) {
-                is Resource.Error -> {
-                    Log.d(TAG, "error")
-                    viewModel.failure.observe(viewLifecycleOwner) { failure ->
-                        Toast.makeText(requireContext(), failure, Toast.LENGTH_SHORT).show()
-                    }
-            }
-                is Resource.Loading -> {
-                    Log.d(TAG, "load")
-                    viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-                        binding.progressBar.isVisible = isLoading
-                    }
-                }
+                is Resource.Error -> Toast.makeText(
+                    requireContext(),
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
 
+                is Resource.Loading -> binding.progressBar.visibility - View.VISIBLE
 
                 is Resource.Success -> {
-                    Log.d(TAG, "success")
-                    viewModel.cardInfo.observe(viewLifecycleOwner) { oneCardInfo ->
-                        binding.content.isVisible = true
-                        bindInformation(oneCardInfo)
-                    }
+                    response.data?.let { data -> bindInformation(data) }
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.content.visibility = View.VISIBLE
                 }
 
             }
@@ -117,7 +107,6 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
             searchButton.setOnClickListener {
                 val cardNumber = binding.editText.text.toString().toInt()
                 viewModel.getCardInfo(cardNumber)
-                Log.d(TAG, "make request")
             }
 
             fab.setOnClickListener {
