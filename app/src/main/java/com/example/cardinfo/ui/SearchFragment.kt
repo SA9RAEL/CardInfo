@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -61,13 +60,12 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
         viewModel.state.observe(viewLifecycleOwner) { response ->
             when (response) {
-                is Resource.Error -> Toast.makeText(
-                    requireContext(),
-                    response.message,
-                    Toast.LENGTH_SHORT
-                ).show()
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.editText.error = "Invalid BIN"
+                }
 
-                is Resource.Loading -> binding.progressBar.visibility - View.VISIBLE
+                is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
 
                 is Resource.Success -> {
                     response.data?.let { data -> bindInformation(data) }
@@ -92,8 +90,8 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     val editText = editText.text
-                    searchButton.isEnabled = editText.length == MAX_LENGTH
-                    if (editText.length < MAX_LENGTH) {
+                    searchButton.isEnabled = editText?.length == MAX_LENGTH
+                    if (editText?.length!! < MAX_LENGTH) {
                         content.isVisible = false
                     }
                 }

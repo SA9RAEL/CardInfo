@@ -1,12 +1,12 @@
 package com.example.cardinfo.ui.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import com.example.cardinfo.network.Resource
-import com.example.cardinfo.ui.singleliveevent.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -17,7 +17,7 @@ class SearchViewModel @Inject constructor(
     private val repository: CardRepository,
 ) : ViewModel() {
 
-    private val _state = SingleLiveEvent<Resource<Card>>()
+    private val _state = MutableLiveData<Resource<Card>>()
     val state: LiveData<Resource<Card>> = _state
 
     fun getCardInfo(cardNumber: Int) =
