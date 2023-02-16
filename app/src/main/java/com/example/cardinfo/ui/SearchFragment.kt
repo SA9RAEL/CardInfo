@@ -1,43 +1,34 @@
 package com.example.cardinfo.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.cardinfo.CardApplication
 import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
+import com.example.cardinfo.network.Resource
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
-import com.example.cardinfo.ui.viewmodel.SearchViewModelFactory
 
 private const val MAX_LENGTH = 8
 
-class SearchFragment : Fragment() {
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModelFactory(
-            CardApplication.getRepository(requireContext())
-        )
-    }
+class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
-    private var _binding: FragmentSearchBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
+    private val binding by viewBinding(FragmentSearchBinding::bind)
+
+    override fun onAttach(context: Context) {
+        (context.applicationContext as CardApplication).appComponent.inject(this)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,24 +47,35 @@ class SearchFragment : Fragment() {
             bankUrlTextView.text = card.bank?.url
             bankNumberTextView.text = card.bank?.phone
             brandResultTextView.text = card.brand
-            prepaidResultTextView.text = card.prepaid.toString()
-            cardNumberLengthResultTextView.text = card.number?.length.toString()
-            cardNumberLuhnResultTextView.text = card.number?.luhn.toString()
             countryNameTextView.text = card.country?.countryName
+            prepaidResultTextView.text = card.prepaid.toString()
+            cardNumberLuhnResultTextView.text = card.number?.luhn.toString()
+            cardNumberLengthResultTextView.text = card.number?.length.toString()
             countryLatitudeResultTextView.text = card.country?.latitude.toString()
             countryLongitudeResultTextView.text = card.country?.longitude.toString()
-
         }
     }
 
     private fun observeViewModel() {
-        viewModel.cardInfo.observe(viewLifecycleOwner) { oneCardInfo ->
-            bindInformation(oneCardInfo)
+
+        viewModel.state.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.editText.error = "Invalid BIN"
+                }
+
+                is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+
+                is Resource.Success -> {
+                    response.data?.let { data -> bindInformation(data) }
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.content.visibility = View.VISIBLE
+                }
+
+            }
         }
 
-        viewModel.failure.observe(viewLifecycleOwner) { failure ->
-            Toast.makeText(requireContext(), failure, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun configureView() {
@@ -88,7 +90,10 @@ class SearchFragment : Fragment() {
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     val editText = editText.text
-                    searchButton.isEnabled = editText.length == MAX_LENGTH
+                    searchButton.isEnabled = editText?.length == MAX_LENGTH
+                    if (editText?.length!! < MAX_LENGTH) {
+                        content.isVisible = false
+                    }
                 }
 
                 override fun afterTextChanged(s: Editable?) = Unit

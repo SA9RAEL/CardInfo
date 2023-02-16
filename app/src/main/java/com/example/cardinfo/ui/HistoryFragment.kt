@@ -1,34 +1,25 @@
 package com.example.cardinfo.ui
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.cardinfo.CardApplication
+import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentHistoryBinding
 import com.example.cardinfo.ui.adapter.CardListAdapter
 import com.example.cardinfo.ui.viewmodel.HistoryViewModel
-import com.example.cardinfo.ui.viewmodel.HistoryViewModelFactory
 
-class HistoryFragment : Fragment() {
+class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
-    private val viewModel: HistoryViewModel by viewModels {
-        HistoryViewModelFactory(
-            (requireContext().applicationContext as CardApplication).repository
-        )
-    }
-    private var _binding: FragmentHistoryBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: HistoryViewModel by viewModels { viewModelFactory }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentHistoryBinding.inflate(inflater, container, false)
-        return binding.root
+    private val binding by viewBinding(FragmentHistoryBinding::bind)
+
+    override fun onAttach(context: Context) {
+        (context.applicationContext as CardApplication).appComponent.inject(this)
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,15 +27,9 @@ class HistoryFragment : Fragment() {
 
         val cardAdapter = CardListAdapter()
 
-
         viewModel.allCardsInfo.observe(viewLifecycleOwner) { allInfo ->
             allInfo.let { cardAdapter.submitList(it) }
-
         }
-
         binding.recyclerView.adapter = cardAdapter
-
-
     }
-
 }

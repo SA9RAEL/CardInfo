@@ -1,35 +1,43 @@
 package com.example.cardinfo.ui.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
+import com.example.cardinfo.network.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import javax.inject.Inject
+import javax.net.ssl.SSLHandshakeException
 
-class SearchViewModel(private val repository: CardRepository) : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val repository: CardRepository,
+) : ViewModel() {
 
-    private val _cardInfo = MutableLiveData<Card>()
-    val cardInfo: LiveData<Card> = _cardInfo
+    private val _state = MutableLiveData<Resource<Card>>()
+    val state: LiveData<Resource<Card>> = _state
 
-    private val _failure = MutableLiveData<String>()
-    val failure: LiveData<String> = _failure
-
-    fun getCardInfo(cardNumber: Int) {
-        viewModelScope.launch {
+    fun getCardInfo(cardNumber: Int) =
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.postValue(Resource.Loading())
             repository.getCardInfo(cardNumber).fold(
-                onSuccess = { _cardInfo.value = it },
-                onFailure = { _failure.value = it.message }
+                onSuccess = { data -> _state.postValue((Resource.Success(data))) },
+                onFailure = { error ->
+                    when (error) {
+                        is SSLHandshakeException ->
+                            _state.postValue((Resource.Error("SSLHandshakeException")))
+
+                        is HttpException ->
+                            _state.postValue((Resource.Error("HttpException")))
+
+                        else ->
+                            _state.postValue((Resource.Error("Invalid card number")))
+                    }
+                }
             )
         }
-    }
-}
 
-class SearchViewModelFactory(private val repository: CardRepository) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-            @Suppress("UNCHECKED CAST")
-            return SearchViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }
