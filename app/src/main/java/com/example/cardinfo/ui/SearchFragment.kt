@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,7 +16,6 @@ import com.example.cardinfo.CardApplication
 import com.example.cardinfo.R
 import com.example.cardinfo.databinding.FragmentSearchBinding
 import com.example.cardinfo.model.room.entities.Card
-import com.example.cardinfo.network.Resource
 import com.example.cardinfo.ui.viewmodel.SearchViewModel
 
 private const val MAX_LENGTH = 8
@@ -58,22 +58,19 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
     private fun observeViewModel() {
 
-        viewModel.state.observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is Resource.Error -> {
-                    binding.progressBar.visibility = View.INVISIBLE
-                    binding.editText.error = "Invalid BIN"
-                }
+        viewModel.data.observe(viewLifecycleOwner) { cardInfo ->
+            cardInfo.data?.let { d -> bindInformation(d) }
+            binding.progressBar.visibility = View.INVISIBLE
+            binding.content.visibility = View.VISIBLE
+        }
 
-                is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            binding.progressBar.visibility = View.INVISIBLE
+            Toast.makeText(requireContext(), error.message, Toast.LENGTH_SHORT).show()
+        }
 
-                is Resource.Success -> {
-                    response.data?.let { data -> bindInformation(data) }
-                    binding.progressBar.visibility = View.INVISIBLE
-                    binding.content.visibility = View.VISIBLE
-                }
-
-            }
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.progressBar.visibility = View.VISIBLE
         }
 
     }
