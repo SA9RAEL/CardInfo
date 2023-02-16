@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cardinfo.data.repository.CardRepository
 import com.example.cardinfo.model.room.entities.Card
 import com.example.cardinfo.network.Resource
+import com.example.cardinfo.ui.singleliveevent.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -17,24 +18,29 @@ class SearchViewModel @Inject constructor(
     private val repository: CardRepository,
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<Resource<Card>>()
-    val state: LiveData<Resource<Card>> = _state
+    private val _data = MutableLiveData<Resource<Card>>()
+    val data: LiveData<Resource<Card>> = _data
+
+    val error = SingleLiveEvent<Resource<Card>>()
+
+    private val _isLoading = MutableLiveData<Resource<Card>>()
+    val isLoading: LiveData<Resource<Card>> = _isLoading
 
     fun getCardInfo(cardNumber: Int) =
         viewModelScope.launch(Dispatchers.IO) {
-            _state.postValue(Resource.Loading())
+            _isLoading.postValue(Resource.Loading())
             repository.getCardInfo(cardNumber).fold(
-                onSuccess = { data -> _state.postValue((Resource.Success(data))) },
+                onSuccess = { data -> _data.postValue((Resource.Success(data))) },
                 onFailure = { error ->
                     when (error) {
                         is SSLHandshakeException ->
-                            _state.postValue((Resource.Error("SSLHandshakeException")))
+                            this@SearchViewModel.error.postValue((Resource.Error("SSLHandshakeException")))
 
                         is HttpException ->
-                            _state.postValue((Resource.Error("HttpException")))
+                            this@SearchViewModel.error.postValue((Resource.Error("HttpException")))
 
                         else ->
-                            _state.postValue((Resource.Error("Invalid card number")))
+                            this@SearchViewModel.error.postValue((Resource.Error("Invalid card number")))
                     }
                 }
             )
